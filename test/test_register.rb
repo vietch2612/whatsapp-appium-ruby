@@ -1,19 +1,59 @@
-class RegisterElement
-  REG_TITLE_ALERT = 'com.whatsapp:id/alertTitle'
-  REG_BTN_MORE_INFO = 'android:id/button1'
-  REG_BTN_OK = 'android:id/button2'
-  REG_TXT_MESSAGE = 'android:id/message'
+require 'test/unit/ui/console/testrunner'
+require 'test/unit'
+require 'appium_lib'
 
-  REG_TXT_WELCOME = 'com.whatsapp:id/eula_title'
-  REG_BTN_AGREE_CONTINUE = 'com.whatsapp:id/eula_accept'
+class TC_EXAMPLE < Test::Unit::TestCase
 
-  REG_BTN_SELECT_COUNTRY = 'com.whatsapp:id/registration_country'
-  REG_TXT_PHONE_CONFIRM_COUNTRY_CODE = 'com.whatsapp:id/registration_cc'
-  REG_TXT_PHONE_NUMBER = 'com.whatsapp:id/registration_phone'
-  REG_BTN_SUBMIT = 'com.whatsapp:id/registration_submit'
+  # Patch to your file
+  APP_PATCH = '../Apk/com.whatsapp.app.apk'
 
-  REG_TEXT_SEARCH = 'com.whatsapp:id/search_et'
-  REG_TXT_COUNTRY_NAME = 'com.whatsapp:id/country_name'
-  REG_TXT_COUNTRY_NAME_ENG = 'com.whatsapp:id/country_en_name'
-  REG_TXT_COUNTRY_CODE = 'com.whatsapp:id/country_code'
-end
+  # Execute this before every test case.
+  def setup
+    caps = {
+        caps: {
+            platformName: 'Android',
+            platformVersion: '5.0',
+            deviceName: 'Android Emulator',
+            app: APP_PATCH,
+            name: 'Ruby Appium Android example'
+        },
+        appium_lib: {
+            sauce_username: nil,
+            sauce_access_key: nil
+        }
+    }
+    driver = Appium::Driver.new(caps)
+    Appium.promote_appium_methods self.class
+    driver.start_driver.manage.timeouts.implicit_wait = 20 # seconds
+  end
+
+  # Execute this after every test case.
+  def teardown
+    driver_quit
+  end
+
+  def test_empty
+    # Empty.
+  end
+
+  def test_file_exists_pass
+    assert(test(?e, __FILE__), "** ERROR:  The file is missing")
+  end
+
+  def abort_test!
+    throw 'abort_test!'
+  end
+
+  def self.abortable m
+    m, m2 = '#{ m }', '__#{ m }__'
+    alias_method m2, m
+    define_method(m) { |*a| catch('abort_test!') { send(m2, *a) } }
+  end
+
+  instance_methods.each { |m| abortable m if m =~ %r/^test/ }
+
+end # TC_EXAMPLE < Test::Unit::TestCase
+
+puts "== beginning the tests"
+Test::Unit::UI::Console::TestRunner.run(TC_EXAMPLE)
+puts "== finished the tests"
